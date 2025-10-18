@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup
+    x:Class="Gestion_intervention.View.AddInterventionPopup"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    x:Name="RootPopup"
+    Size="500,600">
+
+    <Border StrokeShape="RoundRectangle 16"
+            Padding="16"
+            BackgroundColor="{AppThemeBinding Light=#fff, Dark=#222}">
+
+        <ScrollView>
+            <VerticalStackLayout Spacing="12">
+
+                <!-- Titre -->
+                <Label Text="New intervention"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       Margin="0,0,0,8"/>
+
+                <!-- Nom -->
+                <VerticalStackLayout>
+                    <Label Text="Name" />
+                    <Entry Text="{Binding Name}" Placeholder="Intervention name" />
+                </VerticalStackLayout>
+
+                <!-- Début (édition uniquement) -->
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8"
+                      IsVisible="{Binding Source={x:Reference RootPopup}, Path=ShowTimes}">
+                    <Label Text="Start" VerticalOptions="Center"/>
+
+                    <!-- Date -->
+                    <DatePicker Grid.Column="1"
+                                Date="{Binding Source={x:Reference RootPopup}, Path=StartDate, Mode=TwoWay}"
+                                Format="yyyy-MM-dd" />
+
+                    <!-- Heure -->
+                    <TimePicker Grid.Column="2"
+                                Time="{Binding Source={x:Reference RootPopup}, Path=StartClock, Mode=TwoWay}"
+                                Format="HH:mm" />
+                </Grid>
+
+                <!-- Fin (édition uniquement) -->
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8"
+                      IsVisible="{Binding Source={x:Reference RootPopup}, Path=ShowTimes}">
+                    <Label Text="End" VerticalOptions="Center"/>
+
+                    <!-- Date -->
+                    <DatePicker Grid.Column="1"
+                                Date="{Binding Source={x:Reference RootPopup}, Path=EndDate, Mode=TwoWay}"
+                                Format="yyyy-MM-dd" />
+
+                    <!-- Heure -->
+                    <TimePicker Grid.Column="2"
+                                Time="{Binding Source={x:Reference RootPopup}, Path=EndClock, Mode=TwoWay}"
+                                Format="HH:mm" />
+                </Grid>
+
+                <!-- Catégorie -->
+                <VerticalStackLayout>
+                    <Label Text="Category" />
+                    <Picker x:Name="categoryPicker"
+                            SelectedItem="{Binding CategoryType, Mode=TwoWay}" />
+                </VerticalStackLayout>
+
+                <!-- Codes -->
+                <VerticalStackLayout>
+                    <Label Text="Problem" />
+                    <Picker x:Name="problemPicker"
+                            SelectedItem="{Binding Problem, Mode=TwoWay}" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout>
+                    <Label Text="Cause" />
+                    <Picker x:Name="causePicker"
+                            SelectedItem="{Binding Cause, Mode=TwoWay}" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout>
+                    <Label Text="Solution" />
+                    <Picker x:Name="solutionPicker"
+                            SelectedItem="{Binding Solution, Mode=TwoWay}" />
+                </VerticalStackLayout>
+
+                <!-- Description -->
+                <VerticalStackLayout>
+                    <Label Text="Description" />
+                    <Editor Text="{Binding Description}" AutoSize="TextChanges" HeightRequest="100"/>
+                </VerticalStackLayout>
+
+                <!-- Boutons -->
+                <HorizontalStackLayout Spacing="12"
+                                       Margin="0,16,0,0"
+                                       HorizontalOptions="End">
+                    <Button Text="Cancel"
+                            Clicked="OnCancelClicked" />
+                    <Button Text="Save"
+                            Clicked="OnSaveClicked" />
+                </HorizontalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Border>
+</toolkit:Popup>

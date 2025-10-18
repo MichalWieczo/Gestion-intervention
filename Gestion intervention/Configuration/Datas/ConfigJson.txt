@@ -1,0 +1,2 @@
+﻿FOLDER,C:\Users\micha\OneDrive\Bureau\Appli Barry Callebaut\Gestion intervention\Gestion intervention\Configuration\Datas\Json\
+INTERVENTIONS,Intervention.json
