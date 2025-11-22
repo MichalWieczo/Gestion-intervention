@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Maui.Views;
 using Gestion_intervention.Model.Gestion_intervention.Entities;
 using Gestion_intervention.Utilities.Interfaces;
 using Gestion_intervention.View;
