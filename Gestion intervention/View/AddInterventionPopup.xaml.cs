@@ -1,158 +1,338 @@
-using CommunityToolkit.Maui.Views;
-using Gestion_intervention.Model.Gestion_intervention.Entities;
-using Gestion_intervention.ViewModel;
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Gestion_intervention.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:conv="clr-namespace:Gestion_intervention.Utilities.Converters"
+    x:Name="RootPage"
+    Padding="{OnPlatform iOS='0,24,0,0', Android='0'}"
+    BackgroundColor="{AppThemeBinding Light=#F6F7FB, Dark=#151515}">
 
-namespace Gestion_intervention.View;
+    <!-- =================== RESSOURCES =================== -->
+    <ContentPage.Resources>
+        <!-- Converters -->
+        <conv:IsNullToTrueConverter x:Key="IsNullToTrueConverter" />
+        <conv:EndVisibleMultiConverter x:Key="EndVisibleMultiConverter" />
 
-public partial class AddInterventionPopup : Popup
-{
-    private readonly MainPageViewModel _mainPageViewModel;
+        <!-- Couleurs -->
+        <Color x:Key="Primary">#7B6EF6</Color>
+        <Color x:Key="PrimaryDark">#6B5DE3</Color>
+        <Color x:Key="SurfaceLight">#FFFFFF</Color>
+        <Color x:Key="SurfaceDark">#1E1E1E</Color>
+        <Color x:Key="BorderLight">#E6E6F0</Color>
+        <Color x:Key="BorderDark">#2A2A2A</Color>
+        <Color x:Key="TextSubtleLight">#6B7280</Color>
+        <Color x:Key="TextSubtleDark">#9CA3AF</Color>
 
-    // Afficher ou non la section Début/Fin (true en édition)
-    public bool ShowTimes { get; private set; }
+        <!-- Boutons actions -->
+        <Style TargetType="Button" x:Key="ActionButton">
+            <Setter Property="Padding" Value="{OnIdiom Phone='14,10', Tablet='18,10', Desktop='18,10'}"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
+            <Setter Property="TextColor" Value="White"/>
+            <Setter Property="Shadow">
+                <Setter.Value>
+                    <Shadow Brush="#000000"
+                            Opacity="0.18"
+                            Radius="8"
+                            Offset="0,3" />
+                </Setter.Value>
+            </Setter>
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup>
+                        <VisualState x:Name="CommonStates">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="PointerOver">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource PrimaryDark}"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Disabled">
+                            <VisualState.Setters>
+                                <Setter Property="Opacity" Value="0.35"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
 
-    // Modèle édité/ajouté
-    public Intervention InterventionPopupDisplayed { get; private set; }
+        <!-- Boutons Start/End -->
+        <Style TargetType="Button" x:Key="RowPill">
+            <Setter Property="Padding" Value="{OnIdiom Phone='10,6', Tablet='12,6', Desktop='12,6'}"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
+            <Setter Property="TextColor" Value="White"/>
+        </Style>
 
-    // ==== Proxies pour DatePicker/TimePicker ====
-    public DateTime StartDate
-    {
-        get => (DateTime)GetValue(StartDateProperty);
-        set => SetValue(StartDateProperty, value);
-    }
-    public TimeSpan StartClock
-    {
-        get => (TimeSpan)GetValue(StartClockProperty);
-        set => SetValue(StartClockProperty, value);
-    }
-    public DateTime EndDate
-    {
-        get => (DateTime)GetValue(EndDateProperty);
-        set => SetValue(EndDateProperty, value);
-    }
-    public TimeSpan EndClock
-    {
-        get => (TimeSpan)GetValue(EndClockProperty);
-        set => SetValue(EndClockProperty, value);
-    }
+        <!-- En-têtes de colonnes -->
+        <Style TargetType="Label" x:Key="HeaderLabel">
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="TextColor" Value="{AppThemeBinding Light=#111, Dark=#EEE}"/>
+        </Style>
 
-    public static readonly BindableProperty StartDateProperty =
-        BindableProperty.Create(nameof(StartDate), typeof(DateTime), typeof(AddInterventionPopup), DateTime.Today);
+        <!-- Cartes -->
+        <Style TargetType="Border" x:Key="Card">
+            <Setter Property="StrokeShape" Value="RoundRectangle 16"/>
+            <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"/>
+            <Setter Property="Background" Value="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}"/>
+            <Setter Property="Padding" Value="12"/>
+        </Style>
+    </ContentPage.Resources>
 
-    public static readonly BindableProperty StartClockProperty =
-        BindableProperty.Create(nameof(StartClock), typeof(TimeSpan), typeof(AddInterventionPopup), TimeSpan.Zero);
+    <!-- =================== LAYOUT RACINE =================== -->
+    <Grid RowSpacing="12"
+          RowDefinitions="Auto,Auto,*,Auto">
 
-    public static readonly BindableProperty EndDateProperty =
-        BindableProperty.Create(nameof(EndDate), typeof(DateTime), typeof(AddInterventionPopup), DateTime.Today);
+        <!-- Logo de fond (TOUJOURS visible) -->
+        <Image Source="logo_couleur.png"
+               Grid.Row="2"
+               Grid.RowSpan="2"
+               Aspect="AspectFill"
+               Opacity="1"
+               InputTransparent="True"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"
+               WidthRequest="220"
+               HeightRequest="325" />
 
-    public static readonly BindableProperty EndClockProperty =
-        BindableProperty.Create(nameof(EndClock), typeof(TimeSpan), typeof(AddInterventionPopup), TimeSpan.Zero);
-    // ============================================
+        <!-- =================== ENTÊTE (logo + titre) =================== -->
+        <!-- astuce: on met le titre en ColumnSpan=3 pour être VRAIMENT centré -->
+        <Grid Grid.Row="0"
+              ColumnDefinitions="Auto,*"
+              Padding="{OnIdiom Phone='16,12', Tablet='16,12', Desktop='16,12'}"
+              ColumnSpacing="12">
+            <!-- Titre centré sur toute la largeur -->
+            <Image Grid.Column="0"
+                   Source="logo_barry_couleur.png"
+                   HeightRequest="44"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Start"
+                   Margin="20,0,0,0"/>
+        </Grid>
 
-    public AddInterventionPopup(MainPageViewModel mainPageVM, Intervention? interventionToEdit = null)
-    {
-        _mainPageViewModel = mainPageVM;
-        ShowTimes = interventionToEdit != null;
+        <!-- =================== BARRE D’ACTIONS (mobile-style) =================== -->
+        <Border Grid.Row="1"
+                Background="{AppThemeBinding Light=#ECEEF4, Dark=#232323}"
+                StrokeShape="RoundRectangle 18"
+                Padding="12,10"
+                Margin="16,0,16,4">
+            <Border.Shadow>
+                <Shadow Brush="#000000"
+                        Opacity="0.12"
+                        Radius="10"
+                        Offset="0,3" />
+            </Border.Shadow>
 
-        var nextId = _mainPageViewModel?.Interventions?.GetNextId() ?? 1;
+            <ScrollView Orientation="Horizontal"
+                        HorizontalScrollBarVisibility="Never">
+                <HorizontalStackLayout Spacing="12"
+                                       Padding="3,0">
+                    <Button Text="Add"
+                            Style="{StaticResource ActionButton}"
+                            Command="{Binding ShowAddInterventionPopupCommand}" 
+                            BackgroundColor="Black"/>
 
-        // Créer le modèle (nouveau ou copie pour édition)
-        InterventionPopupDisplayed = interventionToEdit != null
-            ? new Intervention(
-                interventionToEdit.Id,
-                interventionToEdit.Name,
-                interventionToEdit.StartTime,
-                interventionToEdit.EndTime,
-                interventionToEdit.CategoryType,
-                interventionToEdit.Problem,
-                interventionToEdit.Cause,
-                interventionToEdit.Solution,
-                interventionToEdit.Description)
-            : new Intervention(
-                id: nextId,
-                name: "",
-                startTime: null,
-                endTime: null,
-                categoryType: Intervention.Category.EM,
-                problem: Intervention.ProblemCode.Unknown,
-                cause: Intervention.CauseCode.Unknown,
-                solution: Intervention.SolutionCode.Unknown,
-                description: ""
-              );
+                    <Button Text="Modify"
+                            Style="{StaticResource ActionButton}"
+                            Command="{Binding ShowEditInterventionPopupCommand}"
+                            BackgroundColor="Black">
+                            
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button"
+                                         Binding="{Binding SelectedIntervention}"
+                                         Value="{x:Null}">
 
-        // Initialiser les proxies (valeurs par défaut si null)
-        var st = InterventionPopupDisplayed.StartTime ?? DateTime.Today;
-        StartDate = st.Date;
-        StartClock = st.TimeOfDay;
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
 
-        var et = InterventionPopupDisplayed.EndTime ?? DateTime.Today;
-        EndDate = et.Date;
-        EndClock = et.TimeOfDay;
+                    <Button Text="Delete"
+                            Style="{StaticResource ActionButton}"
+                            Command="{Binding DeleteInterventionCommand}"
+                            BackgroundColor="Black">
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button"
+                                         Binding="{Binding SelectedIntervention}"
+                                         Value="{x:Null}">
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
 
-        InitializeComponent();
+                    <Button Text="Details"
+                            Style="{StaticResource ActionButton}"
+                            Command="{Binding ShowInterventionDetailsCommand}"
+                            CommandParameter="{Binding SelectedIntervention}"
+                            BackgroundColor="Black">
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button"
+                                         Binding="{Binding SelectedIntervention}"
+                                         Value="{x:Null}">
 
-        // BindingContext = modèle
-        BindingContext = InterventionPopupDisplayed;
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
+                </HorizontalStackLayout>
+            </ScrollView>
+        </Border>
 
-        // Alimentation des pickers enum
-        categoryPicker.ItemsSource = Enum.GetValues(typeof(Intervention.Category));
-        categoryPicker.SelectedItem = InterventionPopupDisplayed.CategoryType;
+        <!-- =================== LISTE – PHONE =================== -->
+        <Border Grid.Row="2"
+                Style="{StaticResource Card}"
+                Background="Transparent"
+                Stroke="{x:Null}"
+                Padding="0"
+                Margin="16,0,16,4">
+            <Grid RowDefinitions="Auto,Auto,*">
+                <Border Grid.Row="0"
+                        Background="{AppThemeBinding Light=#ECEEF4, Dark=#232323}"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="14,10"
+                        Margin="4,4,4,8">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <Label Text="Interventions"
+                               FontAttributes="Bold"
+                               FontSize="16"
+                               TextColor="{AppThemeBinding Light=#111111, Dark=#EEEEEE}" />
+                        <Label Grid.Column="1"
+                               Text="Duration"
+                               FontSize="12"
+                               TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}"
+                               HorizontalTextAlignment="End" />
+                    </Grid>
+                </Border>
 
-        problemPicker.ItemsSource = Enum.GetValues(typeof(Intervention.ProblemCode));
-        problemPicker.SelectedItem = InterventionPopupDisplayed.Problem;
+                <BoxView Grid.Row="1"
+                         HeightRequest="1"
+                         Margin="4,0,4,8"
+                         BackgroundColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}" />
 
-        causePicker.ItemsSource = Enum.GetValues(typeof(Intervention.CauseCode));
-        causePicker.SelectedItem = InterventionPopupDisplayed.Cause;
+                <CollectionView Grid.Row="2"
+                                BackgroundColor="Transparent"
+                                ItemsSource="{Binding Interventions}"
+                                SelectionMode="Single"
+                                SelectedItem="{Binding SelectedIntervention}"
+                                ItemSizingStrategy="MeasureFirstItem"
+                                ItemsLayout="VerticalList">
+                    <CollectionView.EmptyView>
+                        <Label Text="No intervention. Tap “Add”"
+                               HorizontalOptions="Start"
+                               VerticalOptions="Start"
+                               Padding="24"
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}" />
+                    </CollectionView.EmptyView>
 
-        solutionPicker.ItemsSource = Enum.GetValues(typeof(Intervention.SolutionCode));
-        solutionPicker.SelectedItem = InterventionPopupDisplayed.Solution;
-    }
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border StrokeShape="RoundRectangle 18"
+                                    Margin="8,6"
+                                    Padding="12"
+                                    Background="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}"
+                                    Stroke="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}">
+                                <Grid ColumnDefinitions="Auto,*"
+                                      ColumnSpacing="12"
+                                      RowDefinitions="Auto,Auto,Auto">
+                                    <VerticalStackLayout Grid.RowSpan="3"
+                                                         Spacing="8"
+                                                         VerticalOptions="Center">
+                                        <Button Text="Start"
+                                                Style="{StaticResource RowPill}"
+                                                BackgroundColor="#22C55E"
+                                                Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.StartInterventionCommand}"
+                                                CommandParameter="{Binding .}">
+                                            <Button.IsVisible>
+                                                <Binding Path="StartTime" Converter="{StaticResource IsNullToTrueConverter}" />
+                                            </Button.IsVisible>
+                                        </Button>
 
-    private void OnCancelClicked(object sender, EventArgs e) => Close(null);
+                                        <Button Text="End"
+                                                Style="{StaticResource RowPill}"
+                                                BackgroundColor="#EF4444"
+                                                Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.EndInterventionCommand}"
+                                                CommandParameter="{Binding .}">
+                                            <Button.IsVisible>
+                                                <MultiBinding Converter="{StaticResource EndVisibleMultiConverter}">
+                                                    <Binding Path="StartTime" />
+                                                    <Binding Path="EndTime" />
+                                                </MultiBinding>
+                                            </Button.IsVisible>
+                                        </Button>
+                                    </VerticalStackLayout>
 
-    private async void OnSaveClicked(object sender, EventArgs e)
-    {
-        if (!InterventionPopupDisplayed.isValid(out var msg))
-        {
-            await Application.Current.MainPage.DisplayAlert("Validatison", msg, "OK");
-            return;
-        }
+                                    <Label Grid.Column="1"
+                                           Grid.Row="0"
+                                           Text="{Binding Name}"
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           LineBreakMode="TailTruncation"
+                                           TextColor="{AppThemeBinding Light=#1F2937, Dark=#F3F4F6}" />
 
-        // Si on modifie et que la section est visible, appliquer les changements
-        if (ShowTimes)
-        {
-            InterventionPopupDisplayed.StartTime = StartDate.Date + StartClock;
-            InterventionPopupDisplayed.EndTime = EndDate.Date + EndClock;
-        }
+                                    <Label Grid.Column="1"
+                                           Grid.Row="1"
+                                           Text="{Binding CategoryType}"
+                                           FontSize="13"
+                                           TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}" />
 
-        var existing = _mainPageViewModel.Interventions
-            .FirstOrDefault(i => i.Id == InterventionPopupDisplayed.Id);
+                                    <Grid Grid.Column="1"
+                                          Grid.Row="2"
+                                          ColumnDefinitions="*,*,Auto"
+                                          ColumnSpacing="10">
+                                        <Label Grid.Column="0"
+                                               Text="{Binding StartTime, StringFormat='Start: {0:dd-MM HH\\:mm}'}"
+                                               FontSize="12"
+                                               TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}" />
+                                        <Label Grid.Column="1"
+                                               Text="{Binding EndTime, StringFormat='End: {0:dd-MM HH\\:mm}'}"
+                                               FontSize="12"
+                                               TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}" />
+                                        <Border Grid.Column="2"
+                                                StrokeShape="RoundRectangle 12"
+                                                Padding="10,3"
+                                                Background="{AppThemeBinding Light=#EEF2FF, Dark=#2A2A42}">
+                                            <Label Text="{Binding Duration, StringFormat='{}{0:hh\\:mm}'}"
+                                                   FontSize="12"
+                                                   TextColor="{AppThemeBinding Light=#3949AB, Dark=#C7D2FE}" />
+                                        </Border>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </Border>
 
-        if (existing == null)
-        {
-            _mainPageViewModel.Interventions.Add(InterventionPopupDisplayed);
-        }
-        else
-        {
-            existing.Name = InterventionPopupDisplayed.Name;
-            existing.StartTime = InterventionPopupDisplayed.StartTime;
-            existing.EndTime = InterventionPopupDisplayed.EndTime;
-            existing.CategoryType = InterventionPopupDisplayed.CategoryType;
-            existing.Problem = InterventionPopupDisplayed.Problem;
-            existing.Cause = InterventionPopupDisplayed.Cause;
-            existing.Solution = InterventionPopupDisplayed.Solution;
-            existing.Description = InterventionPopupDisplayed.Description;
-        }
 
-        try
-        {
-            _mainPageViewModel.SaveInterventionsToFile();
+        <!-- =================== PIED =================== -->
+        <Grid Grid.Row="3"
+              Padding="16,0,16,16"
+              ColumnDefinitions="*,Auto">
+            <Label Text="Stay productive wherever you are."
+                   FontSize="12"
+                   TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}"
+                   VerticalTextAlignment="Center"/>
+            <Border Grid.Column="1"
+                    StrokeShape="RoundRectangle 14"
+                    Background="{AppThemeBinding Light=#EEF2FF, Dark=#2A2A42}"
+                    Padding="12,6">
+                <HorizontalStackLayout Spacing="4">
+                    <Label Text="Total" FontSize="12" TextColor="{AppThemeBinding Light=#3949AB, Dark=#C7D2FE}" />
+                    <Label Text=":" FontSize="12" TextColor="{AppThemeBinding Light=#3949AB, Dark=#C7D2FE}" />
+                    <Label Text="{Binding Interventions.Count}"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=#1F2937, Dark=#F9FAFB}" />
+                </HorizontalStackLayout>
+            </Border>
+        </Grid>
 
-            Close(InterventionPopupDisplayed);
-        }
-        catch (Exception ex)
-        {
-            await Application.Current.MainPage.DisplayAlert("Error", $"Save failed: {ex.Message}", "OK");
-        }
-    }
-}
+    </Grid>
+</ContentPage>
