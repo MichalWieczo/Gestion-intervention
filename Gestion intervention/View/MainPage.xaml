@@ -1,11 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
     x:Class="Gestion_intervention.MainPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:conv="clr-namespace:Gestion_intervention.Utilities.Converters"
     x:Name="RootPage"
-    Padding="0"
+    Padding="{OnPlatform iOS='0,24,0,0', Android='0'}"
     BackgroundColor="{AppThemeBinding Light=#F6F7FB, Dark=#151515}">
 
     <!-- =================== RESSOURCES =================== -->
@@ -26,11 +26,20 @@
 
         <!-- Boutons actions -->
         <Style TargetType="Button" x:Key="ActionButton">
-            <Setter Property="Padding" Value="{OnIdiom Phone='14,8', Tablet='18,10', Desktop='18,10'}"/>
-            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="{OnIdiom Phone='14,10', Tablet='18,10', Desktop='18,10'}"/>
+            <Setter Property="CornerRadius" Value="16"/>
             <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
             <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
             <Setter Property="TextColor" Value="White"/>
+            <Setter Property="Shadow">
+                <Setter.Value>
+                    <Shadow Brush="#000000"
+                            Opacity="0.18"
+                            Radius="8"
+                            Offset="0,3" />
+                </Setter.Value>
+            </Setter>
             <Setter Property="VisualStateManager.VisualStateGroups">
                 <VisualStateGroupList>
                     <VisualStateGroup>
@@ -46,7 +55,7 @@
                         </VisualState>
                         <VisualState x:Name="Disabled">
                             <VisualState.Setters>
-                                <Setter Property="Opacity" Value="0.4"/>
+                                <Setter Property="Opacity" Value="0.35"/>
                             </VisualState.Setters>
                         </VisualState>
                     </VisualStateGroup>
@@ -79,190 +88,176 @@
     </ContentPage.Resources>
 
     <!-- =================== LAYOUT RACINE =================== -->
-    <Grid RowDefinitions="Auto,Auto,*,Auto">
-
-        <!-- Dégradé de fond -->
-        <Grid.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                <GradientStop Color="{AppThemeBinding Light=#F9FAFF, Dark=#121212}" Offset="0.0"/>
-                <GradientStop Color="{AppThemeBinding Light=#F3F4F8, Dark=#171717}" Offset="1.0"/>
-            </LinearGradientBrush>
-        </Grid.Background>
+    <Grid RowSpacing="12"
+          RowDefinitions="Auto,Auto,*,Auto">
 
         <!-- Logo de fond (TOUJOURS visible) -->
-        <Image Source="logo.png"
+        <Image Source="logo_couleur.png"
                Grid.Row="2"
                Grid.RowSpan="2"
-               Aspect="AspectFit"
-               Opacity="0.05"
+               Aspect="AspectFill"
+               Opacity="1"
                InputTransparent="True"
                HorizontalOptions="Center"
                VerticalOptions="Center"
-               WidthRequest="{OnIdiom Phone=240, Tablet=420, Desktop=640}"
-               HeightRequest="{OnIdiom Phone=240, Tablet=420, Desktop=640}" />
+               WidthRequest="220"
+               HeightRequest="325" />
 
         <!-- =================== ENTÊTE (logo + titre) =================== -->
         <!-- astuce: on met le titre en ColumnSpan=3 pour être VRAIMENT centré -->
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="{OnIdiom Phone='12,8', Tablet='16,8', Desktop='16,8'}">
+        <Grid Grid.Row="0"
+              ColumnDefinitions="Auto,*"
+              Padding="{OnIdiom Phone='16,12', Tablet='16,12', Desktop='16,12'}"
+              ColumnSpacing="12">
             <!-- Titre centré sur toute la largeur -->
-            <Label Grid.ColumnSpan="3"
-                   Text="Monitoring of interventions"
-                   FontSize="{OnIdiom Phone=18, Tablet=22, Desktop=22}"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center"
-                   TextColor="{AppThemeBinding Light=#0F172A, Dark=#E5E7EB}"/>
-
-            <!-- Logo à gauche -->
             <Image Grid.Column="0"
-                   Source="logo_barry.png"
-                   HeightRequest="{OnIdiom Phone=40, Tablet=56, Desktop=56}"
+                   Source="logo_barry_couleur.png"
+                   HeightRequest="44"
                    VerticalOptions="Center"
-                   HorizontalOptions="Start"/>
+                   HorizontalOptions="Start"
+                   Margin="20,0,0,0"/>
         </Grid>
 
-        <!-- =================== BARRE D’ACTIONS (header-style) =================== -->
+        <!-- =================== BARRE D’ACTIONS (mobile-style) =================== -->
         <Border Grid.Row="1"
-        Background="{AppThemeBinding Light=#ECEEF4, Dark=#232323}"
-        StrokeShape="RoundRectangle 12"
-        Padding="{OnIdiom Phone='10,8', Tablet='14,10', Desktop='16,12'}"
-        Margin="{OnIdiom Phone='12,0,12,8', Tablet='16,0,16,8', Desktop='16,0,16,8'}">
+                Background="{AppThemeBinding Light=#ECEEF4, Dark=#232323}"
+                StrokeShape="RoundRectangle 18"
+                Padding="12,10"
+                Margin="16,0,16,4">
             <Border.Shadow>
-                <Shadow Brush="#000000" Opacity="0.15" Radius="6" Offset="0,2" />
+                <Shadow Brush="#000000"
+                        Opacity="0.12"
+                        Radius="10"
+                        Offset="0,3" />
             </Border.Shadow>
 
-            <FlexLayout Direction="Row"
-                Wrap="Wrap"
-                JustifyContent="Center"
-                AlignItems="Center"
-                AlignContent="Center">
+            <ScrollView Orientation="Horizontal"
+                        HorizontalScrollBarVisibility="Never">
+                <HorizontalStackLayout Spacing="12"
+                                       Padding="3,0">
+                    <Button Text="Add"
+                            Style="{StaticResource ActionButton}"
+                            Command="{Binding ShowAddInterventionPopupCommand}" 
+                            BackgroundColor="Black"/>
 
-                <!-- Style local : marges pour simuler un 'gap' entre les boutons -->
-                <FlexLayout.Resources>
-                    <Style TargetType="Button">
-                        <!-- marge (droite + bas) pour gérer l’enroulement sur mobile -->
-                        <Setter Property="Margin"
-                        Value="{OnIdiom Phone='0,0,8,8', Tablet='0,0,10,0', Desktop='0,0,12,0'}" />
-                    </Style>
-                </FlexLayout.Resources>
+                    <Button Text="Modify"
+                            Style="{StaticResource ActionButton}"
+                            Command="{Binding ShowEditInterventionPopupCommand}"
+                            BackgroundColor="Black">
+                            
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button"
+                                         Binding="{Binding SelectedIntervention}"
+                                         Value="{x:Null}">
 
-                <Button Text="Add"
-                Style="{StaticResource ActionButton}"
-                Command="{Binding ShowAddInterventionPopupCommand}" />
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
 
-                <Button Text="Modify"
-                Style="{StaticResource ActionButton}"
-                Command="{Binding ShowEditInterventionPopupCommand}">
-                    <Button.Triggers>
-                        <DataTrigger TargetType="Button"
-                             Binding="{Binding SelectedIntervention}"
-                             Value="{x:Null}">
-                            <Setter Property="IsEnabled" Value="False" />
-                        </DataTrigger>
-                    </Button.Triggers>
-                </Button>
+                    <Button Text="Delete"
+                            Style="{StaticResource ActionButton}"
+                            Command="{Binding DeleteInterventionCommand}"
+                            BackgroundColor="Black">
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button"
+                                         Binding="{Binding SelectedIntervention}"
+                                         Value="{x:Null}">
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
 
-                <Button Text="Delete"
-                Style="{StaticResource ActionButton}"
-                Command="{Binding DeleteInterventionCommand}">
-                    <Button.Triggers>
-                        <DataTrigger TargetType="Button"
-                             Binding="{Binding SelectedIntervention}"
-                             Value="{x:Null}">
-                            <Setter Property="IsEnabled" Value="False" />
-                        </DataTrigger>
-                    </Button.Triggers>
-                </Button>
+                    <Button Text="Details"
+                            Style="{StaticResource ActionButton}"
+                            Command="{Binding ShowInterventionDetailsCommand}"
+                            CommandParameter="{Binding SelectedIntervention}"
+                            BackgroundColor="Black">
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button"
+                                         Binding="{Binding SelectedIntervention}"
+                                         Value="{x:Null}">
 
-                <Button Text="Details"
-                Style="{StaticResource ActionButton}"
-                Command="{Binding ShowInterventionDetailsCommand}"
-                CommandParameter="{Binding SelectedIntervention}">
-                    <Button.Triggers>
-                        <DataTrigger TargetType="Button"
-                             Binding="{Binding SelectedIntervention}"
-                             Value="{x:Null}">
-                            <Setter Property="IsEnabled" Value="False" />
-                        </DataTrigger>
-                    </Button.Triggers>
-                </Button>
-
-            </FlexLayout>
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
+                </HorizontalStackLayout>
+            </ScrollView>
         </Border>
 
+        <!-- =================== LISTE – PHONE =================== -->
+        <Border Grid.Row="2"
+                Style="{StaticResource Card}"
+                Background="Transparent"
+                Stroke="{x:Null}"
+                Padding="0"
+                Margin="16,0,16,4">
+            <Grid RowDefinitions="Auto,Auto,*">
+                <Border Grid.Row="0"
+                        Background="{AppThemeBinding Light=#ECEEF4, Dark=#232323}"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="14,10"
+                        Margin="4,4,4,8">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <Label Text="Interventions"
+                               FontAttributes="Bold"
+                               FontSize="16"
+                               TextColor="{AppThemeBinding Light=#111111, Dark=#EEEEEE}" />
+                        <Label Grid.Column="1"
+                               Text="Duration"
+                               FontSize="12"
+                               TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}"
+                               HorizontalTextAlignment="End" />
+                    </Grid>
+                </Border>
 
+                <BoxView Grid.Row="1"
+                         HeightRequest="1"
+                         Margin="4,0,4,8"
+                         BackgroundColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}" />
 
-        <!-- =================== LISTE – DESKTOP / TABLET =================== -->
-        <ContentView Grid.Row="2" IsVisible="{OnIdiom Phone=false, Tablet=true, Desktop=true}">
-            <!-- Card transparent pour ne pas teinter la liste -->
-            <Border Style="{StaticResource Card}"
-            Background="Transparent"
-            Stroke="{x:Null}"
-            Padding="0"
-            Margin="{OnIdiom Phone='12,0,12,8', Tablet='16,0,16,8', Desktop='16,0,16,8'}">
+                <CollectionView Grid.Row="2"
+                                BackgroundColor="Transparent"
+                                ItemsSource="{Binding Interventions}"
+                                SelectionMode="Single"
+                                SelectedItem="{Binding SelectedIntervention}"
+                                ItemSizingStrategy="MeasureFirstItem"
+                                ItemsLayout="VerticalList">
+                    <CollectionView.EmptyView>
+                        <Label Text="No intervention. Tap “Add”"
+                               HorizontalOptions="Start"
+                               VerticalOptions="Start"
+                               Padding="24"
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}" />
+                    </CollectionView.EmptyView>
 
-                <Grid RowDefinitions="Auto,Auto,*">
-
-                    <!-- En-têtes SEULEMENT avec fond gris -->
-                    <Border Grid.Row="0"
-                    Background="{AppThemeBinding Light=#ECEEF4, Dark=#232323}"
-                    StrokeShape="RoundRectangle 12"
-                    Padding="10,8"
-                    Margin="4,4,4,6">
-                        <Grid ColumnDefinitions="120,2*,*,140,140,100"
-                      ColumnSpacing="9">
-                            <Label Grid.Column="0" Text="Actions"  Style="{StaticResource HeaderLabel}"/>
-                            <Label Grid.Column="1" Text="Name"     Style="{StaticResource HeaderLabel}"/>
-                            <Label Grid.Column="2" Text="Category" Style="{StaticResource HeaderLabel}"/>
-                            <Label Grid.Column="3" Text="Start"    Style="{StaticResource HeaderLabel}" HorizontalTextAlignment="End"/>
-                            <Label Grid.Column="4" Text="End"      Style="{StaticResource HeaderLabel}" HorizontalTextAlignment="End"/>
-                            <Label Grid.Column="5" Text="Duration" Style="{StaticResource HeaderLabel}" HorizontalTextAlignment="Center"/>
-                        </Grid>
-                    </Border>
-
-                    <!-- Fine séparation sous l’en-tête (optionnelle) -->
-                    <BoxView Grid.Row="1"
-                     HeightRequest="1"
-                     Margin="4,0,4,6"
-                     BackgroundColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"/>
-
-                    <!-- Lignes -->
-                    <CollectionView Grid.Row="2"
-                            BackgroundColor="Transparent"
-                            ItemsSource="{Binding Interventions}"
-                            SelectionMode="Single"
-                            SelectedItem="{Binding SelectedIntervention}"
-                            ItemsLayout="VerticalList">
-
-                        <CollectionView.EmptyView>
-                            <Label Text="No intervention. Tap “Add”"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center"
-                           Padding="24"
-                           TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}"/>
-                        </CollectionView.EmptyView>
-
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Padding="10,8"
-                              ColumnDefinitions="120,2*,*,140,140,100"
-                              ColumnSpacing="9">
-
-                                    <!-- Actions -->
-                                    <HorizontalStackLayout Grid.Column="0" Spacing="6" VerticalOptions="Center">
-                                        <Button Text="Start" Style="{StaticResource RowPill}"
-                                        Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.StartInterventionCommand}"
-                                        CommandParameter="{Binding .}"
-                                        BackgroundColor="Green">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border StrokeShape="RoundRectangle 18"
+                                    Margin="8,6"
+                                    Padding="12"
+                                    Background="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}"
+                                    Stroke="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}">
+                                <Grid ColumnDefinitions="Auto,*"
+                                      ColumnSpacing="12"
+                                      RowDefinitions="Auto,Auto,Auto">
+                                    <VerticalStackLayout Grid.RowSpan="3"
+                                                         Spacing="8"
+                                                         VerticalOptions="Center">
+                                        <Button Text="Start"
+                                                Style="{StaticResource RowPill}"
+                                                BackgroundColor="#22C55E"
+                                                Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.StartInterventionCommand}"
+                                                CommandParameter="{Binding .}">
                                             <Button.IsVisible>
                                                 <Binding Path="StartTime" Converter="{StaticResource IsNullToTrueConverter}" />
                                             </Button.IsVisible>
                                         </Button>
 
-                                        <Button Text="End" Style="{StaticResource RowPill}"
-                                        Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.EndInterventionCommand}"
-                                        CommandParameter="{Binding .}"
-                                        BackgroundColor="Red">
+                                        <Button Text="End"
+                                                Style="{StaticResource RowPill}"
+                                                BackgroundColor="#EF4444"
+                                                Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.EndInterventionCommand}"
+                                                CommandParameter="{Binding .}">
                                             <Button.IsVisible>
                                                 <MultiBinding Converter="{StaticResource EndVisibleMultiConverter}">
                                                     <Binding Path="StartTime" />
@@ -270,157 +265,73 @@
                                                 </MultiBinding>
                                             </Button.IsVisible>
                                         </Button>
-                                    </HorizontalStackLayout>
-
-                                    <Label Grid.Column="1" Text="{Binding Name}" LineBreakMode="TailTruncation" VerticalTextAlignment="Center" />
-                                    <Label Grid.Column="2" Text="{Binding CategoryType}" VerticalTextAlignment="Center"/>
-                                    <Label Grid.Column="3" Text="{Binding StartTime, StringFormat='{}{0:dd-MM-yyyy HH\\:mm}'}" VerticalTextAlignment="Center" HorizontalTextAlignment="End" />
-                                    <Label Grid.Column="4" Text="{Binding EndTime,   StringFormat='{}{0:dd-MM-yyyy HH\\:mm}'}" VerticalTextAlignment="Center" HorizontalTextAlignment="End" />
-                                    <Label Grid.Column="5" Text="{Binding Duration,  StringFormat='{}{0:hh\\:mm}'}"        VerticalTextAlignment="Center" HorizontalTextAlignment="Center" />
-
-                                    <BoxView Grid.ColumnSpan="6" HeightRequest="1"
-                                     BackgroundColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
-                                     VerticalOptions="End" Margin="0,8,0,0"/>
-                                </Grid>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </Grid>
-            </Border>
-        </ContentView>
-
-
-        <!-- =================== LISTE – PHONE (carte compacte) =================== -->
-        <ContentView Grid.Row="2" IsVisible="{OnIdiom Phone=true, Tablet=false, Desktop=false}">
-            <!-- Card transparent pour ne pas teinter la liste -->
-            <Border Style="{StaticResource Card}"
-            Background="Transparent"
-            Stroke="{x:Null}"
-            Padding="0"
-            Margin="12,0,12,8">
-
-                <Grid RowDefinitions="Auto,Auto,*">
-
-                    <!-- En-tête SEULEMENT (fond gris) -->
-                    <Border Grid.Row="0"
-                    Background="{AppThemeBinding Light=#ECEEF4, Dark=#232323}"
-                    StrokeShape="RoundRectangle 12"
-                    Padding="10,8"
-                    Margin="4,4,4,6">
-                        <!-- Petit header compact pour mobile -->
-                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                            <Label Text="Interventions"
-                           FontAttributes="Bold"
-                           TextColor="{AppThemeBinding Light=#111, Dark=#EEE}" />
-                            <Label Grid.Column="1"
-                           Text="Start • End • Duration"
-                           TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}"
-                           HorizontalTextAlignment="End" />
-                        </Grid>
-                    </Border>
-
-                    <!-- Fine séparation sous l’en-tête (optionnelle) -->
-                    <BoxView Grid.Row="1"
-                     HeightRequest="1"
-                     Margin="4,0,4,6"
-                     BackgroundColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"/>
-
-                    <!-- Liste des éléments (fond transparent) -->
-                    <CollectionView Grid.Row="2"
-                            BackgroundColor="Transparent"
-                            ItemsSource="{Binding Interventions}"
-                            SelectionMode="Single"
-                            SelectedItem="{Binding SelectedIntervention}"
-                            ItemsLayout="VerticalList">
-
-                        <CollectionView.EmptyView>
-                            <Label Text="No intervention. Tap “Add”"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center"
-                           Padding="16"
-                           TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}"/>
-                        </CollectionView.EmptyView>
-
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Padding="8,10"
-                              ColumnDefinitions="Auto,*"
-                              RowDefinitions="Auto,Auto,Auto"
-                              ColumnSpacing="10">
-
-                                    <!-- Boutons Start/End -->
-                                    <VerticalStackLayout Grid.RowSpan="3"
-                                                 Spacing="6"
-                                                 VerticalOptions="Center">
-                                        <Button Text="Start" Style="{StaticResource RowPill}"
-                                        BackgroundColor="Green"
-                                        Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.StartInterventionCommand}"
-                                        CommandParameter="{Binding .}">
-                                            <Button.IsVisible>
-                                                <Binding Path="StartTime" Converter="{StaticResource IsNullToTrueConverter}" />
-                                            </Button.IsVisible>
-                                        </Button>
-
-                                        <Button Text="End" Style="{StaticResource RowPill}"
-                                        BackgroundColor="Red"
-                                        Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.EndInterventionCommand}"
-                                        CommandParameter="{Binding .}">
-                                            <Button.IsVisible>
-                                                <MultiBinding Converter="{StaticResource EndVisibleMultiConverter}">
-                                                    <Binding Path="StartTime"/>
-                                                    <Binding Path="EndTime"/>
-                                                </MultiBinding>
-                                            </Button.IsVisible>
-                                        </Button>
                                     </VerticalStackLayout>
 
-                                    <!-- Nom -->
-                                    <Label Grid.Column="1" Grid.Row="0"
-                                   Text="{Binding Name}"
-                                   FontAttributes="Bold" />
+                                    <Label Grid.Column="1"
+                                           Grid.Row="0"
+                                           Text="{Binding Name}"
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           LineBreakMode="TailTruncation"
+                                           TextColor="{AppThemeBinding Light=#1F2937, Dark=#F3F4F6}" />
 
-                                    <!-- Catégorie -->
-                                    <Label Grid.Column="1" Grid.Row="1"
-                                   Text="{Binding CategoryType}"
-                                   TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}"/>
+                                    <Label Grid.Column="1"
+                                           Grid.Row="1"
+                                           Text="{Binding CategoryType}"
+                                           FontSize="13"
+                                           TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}" />
 
-                                    <!-- Times + durée -->
-                                    <HorizontalStackLayout Grid.Column="1" Grid.Row="2" Spacing="12">
-                                        <Label Text="{Binding StartTime, StringFormat='Start: {0:dd-MM HH\\:mm}'}"
-                                       TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}"/>
-                                        <Label Text="{Binding EndTime,   StringFormat='End: {0:dd-MM HH\\:mm}'}"
-                                       TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}"/>
-                                        <Border StrokeShape="RoundRectangle 12" Padding="8,2"
-                                        Background="{AppThemeBinding Light=#EEF2FF, Dark=#2A2A42}">
+                                    <Grid Grid.Column="1"
+                                          Grid.Row="2"
+                                          ColumnDefinitions="*,*,Auto"
+                                          ColumnSpacing="10">
+                                        <Label Grid.Column="0"
+                                               Text="{Binding StartTime, StringFormat='Start: {0:dd-MM HH\\:mm}'}"
+                                               FontSize="12"
+                                               TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}" />
+                                        <Label Grid.Column="1"
+                                               Text="{Binding EndTime, StringFormat='End: {0:dd-MM HH\\:mm}'}"
+                                               FontSize="12"
+                                               TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}" />
+                                        <Border Grid.Column="2"
+                                                StrokeShape="RoundRectangle 12"
+                                                Padding="10,3"
+                                                Background="{AppThemeBinding Light=#EEF2FF, Dark=#2A2A42}">
                                             <Label Text="{Binding Duration, StringFormat='{}{0:hh\\:mm}'}"
-                                           TextColor="{AppThemeBinding Light=#3949AB, Dark=#C7D2FE}"/>
+                                                   FontSize="12"
+                                                   TextColor="{AppThemeBinding Light=#3949AB, Dark=#C7D2FE}" />
                                         </Border>
-                                    </HorizontalStackLayout>
-
-                                    <!-- Fine séparation entre items -->
-                                    <BoxView Grid.ColumnSpan="2" Grid.RowSpan="3"
-                                     HeightRequest="1"
-                                     BackgroundColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
-                                     VerticalOptions="End" Margin="0,10,0,0"/>
+                                    </Grid>
                                 </Grid>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </Grid>
-            </Border>
-        </ContentView>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </Border>
 
 
         <!-- =================== PIED =================== -->
-        <Grid Grid.Row="3" Padding="{OnIdiom Phone='12,0', Tablet='16,0', Desktop='16,0'}" ColumnDefinitions="*,Auto">
-            <Label Text=""
+        <Grid Grid.Row="3"
+              Padding="16,0,16,16"
+              ColumnDefinitions="*,Auto">
+            <Label Text="Stay productive wherever you are."
+                   FontSize="12"
                    TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}"
                    VerticalTextAlignment="Center"/>
-            <HorizontalStackLayout Grid.Column="1">
-                <Label Text="Total : "
-                       TextColor="{AppThemeBinding Light={StaticResource TextSubtleLight}, Dark={StaticResource TextSubtleDark}}"/>
-                <Label Text="{Binding Interventions.Count}" FontAttributes="Bold"/>
-            </HorizontalStackLayout>
+            <Border Grid.Column="1"
+                    StrokeShape="RoundRectangle 14"
+                    Background="{AppThemeBinding Light=#EEF2FF, Dark=#2A2A42}"
+                    Padding="12,6">
+                <HorizontalStackLayout Spacing="4">
+                    <Label Text="Total" FontSize="12" TextColor="{AppThemeBinding Light=#3949AB, Dark=#C7D2FE}" />
+                    <Label Text=":" FontSize="12" TextColor="{AppThemeBinding Light=#3949AB, Dark=#C7D2FE}" />
+                    <Label Text="{Binding Interventions.Count}"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=#1F2937, Dark=#F9FAFB}" />
+                </HorizontalStackLayout>
+            </Border>
         </Grid>
 
     </Grid>
