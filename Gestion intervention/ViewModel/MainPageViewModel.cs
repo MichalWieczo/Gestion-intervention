@@ -1,11 +1,10 @@
-﻿using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Gestion_intervention.Model.Gestion_intervention.Collection;
 using Gestion_intervention.Model.Gestion_intervention.Entities;
 using Gestion_intervention.Utilities.Interfaces;
 using Gestion_intervention.View;
-using Newtonsoft.Json;
 
 namespace Gestion_intervention.ViewModel
 {
@@ -36,9 +35,9 @@ namespace Gestion_intervention.ViewModel
         [RelayCommand]
         private async void ShowInterventionDetails(Intervention intervention)
         {
-            if (selectedIntervention != null)
+            if (SelectedIntervention != null)
             {
-                var itr = selectedIntervention;
+                var itr = SelectedIntervention;
 
                 string startStr = itr.StartTime?.ToString("dd-MM-yy HH:mm:ss") ?? "—";
                 string endStr = itr.EndTime?.ToString("dd-MM-yy HH:mm:ss") ?? "—";
@@ -77,42 +76,45 @@ namespace Gestion_intervention.ViewModel
         [RelayCommand]
         private async Task DeleteIntervention()
         {
-            if (selectedIntervention == null)
+            if (SelectedIntervention == null)
             {
                 await alertService.ShowAlert("No intervention selected", "Please select an intervention to delete."
 );
                 return;
             }
 
-            bool confirm = await Application.Current.MainPage.DisplayAlert("Delete confirmation", $"Are you sure you want to delete the intervention '{selectedIntervention.Name}'?", "YES", "NO"
+            bool confirm = await Application.Current.MainPage.DisplayAlert("Delete confirmation", $"Are you sure you want to delete the intervention '{SelectedIntervention.Name}'?", "YES", "NO"
 );
 
             if (!confirm)
                 return;
 
-            Interventions.Remove(selectedIntervention);
+            var interventionToDelete = SelectedIntervention;
 
-            string path = "C:\\Users\\micha\\OneDrive\\Bureau\\Appli Barry Callebaut\\Gestion intervention\\Gestion intervention\\Configuration\\Datas\\Json\\Intervention.json";
-            string json = JsonConvert.SerializeObject(Interventions, Formatting.Indented, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
-            File.WriteAllText(path, json);
+            bool deleted = Interventions.DeleteIntervention(interventionToDelete);
 
-            selectedIntervention = null;
-
-            await alertService.ShowAlert("Intervention deleted", "The intervention has been successfully deleted."
+            if (!deleted)
+            {
+                await alertService.ShowAlert("Delete failed", "Unable to delete the selected intervention. Please try again."
 );
+                return;
+            }
+
+            SaveInterventionsToFile();
+            
         }
 
         [RelayCommand]
         public void ShowEditInterventionPopup()
         {
-            if (selectedIntervention == null)
+            if (SelectedIntervention == null)
             {
                 Application.Current.MainPage.DisplayAlert("No intervention selected", "Please select an intervention to edit.", "OK"
 );
                 return;
             }
 
-            var popup = new AddInterventionPopup(this, selectedIntervention);
+            var popup = new AddInterventionPopup(this, SelectedIntervention);
             Shell.Current.CurrentPage.ShowPopup(popup);
         }
 
@@ -148,129 +150,3 @@ namespace Gestion_intervention.ViewModel
 
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
