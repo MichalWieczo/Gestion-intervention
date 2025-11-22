@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 
 namespace Gestion_intervention.Model.Gestion_intervention.Entities
