@@ -1,4 +1,4 @@
-﻿using Gestion_de_stock.Utilities.DataAccess.Files;
+using Gestion_de_stock.Utilities.DataAccess.Files;
 using Gestion_intervention.Model.Gestion_intervention.Collection;
 using Gestion_intervention.Utilities.Interfaces;
 using Microsoft.Maui.Storage; // FileSystem.AppDataDirectory
