@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Maui.Views;
 using Gestion_intervention.Model.Gestion_intervention.Entities;
 using Gestion_intervention.ViewModel;
 
@@ -114,7 +114,7 @@ public partial class AddInterventionPopup : Popup
     {
         if (!InterventionPopupDisplayed.isValid(out var msg))
         {
-            await Application.Current.MainPage.DisplayAlert("Validation", msg, "OK");
+            await Application.Current.MainPage.DisplayAlert("Validatison", msg, "OK");
             return;
         }
 
@@ -147,7 +147,7 @@ public partial class AddInterventionPopup : Popup
         try
         {
             _mainPageViewModel.SaveInterventionsToFile();
-            await Application.Current.MainPage.DisplayAlert("Save", "Intervention saved successfully.", "OK");
+
             Close(InterventionPopupDisplayed);
         }
         catch (Exception ex)
