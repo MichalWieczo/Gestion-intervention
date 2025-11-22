@@ -1,4 +1,4 @@
-﻿using Gestion_intervention.Utilities.Interfaces;
+using Gestion_intervention.Utilities.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
