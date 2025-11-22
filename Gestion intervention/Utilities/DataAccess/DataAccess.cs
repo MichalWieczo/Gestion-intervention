@@ -1,12 +1,7 @@
-﻿using Gestion_de_stock.Utilities.DataAccess.Files;
+using Gestion_de_stock.Utilities.DataAccess.Files;
 using Gestion_intervention.Model.Gestion_intervention.Collection;
 using Gestion_intervention.Utilities.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Gestion_intervention.Utilities.DataAccess
 {
